@@ -2,15 +2,14 @@ import express from "express";
 import { MongoClient } from "mongodb";
 import { ObjectId } from "mongodb";
 import cors from "cors";
-
+import * as dotenv from "dotenv";
 import { auth } from "./middleware/auth.js";
 
 const app = express();
-const PORT = 4000;
-
+dotenv.config();
+const PORT = process.env.PORT;
 //connecting MongoDb___________________
-const MONGO_URL =
-  "mongodb+srv://raghutwo:welcome123@cluster0.4gd3qjn.mongodb.net/";
+const MONGO_URL = process.env.MONGO_URL;
 const client = new MongoClient(MONGO_URL);
 await client.connect();
 console.log("mongo connected");
