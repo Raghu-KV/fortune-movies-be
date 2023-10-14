@@ -1,6 +1,9 @@
 import express from "express";
 import { MongoClient } from "mongodb";
 import { ObjectId } from "mongodb";
+import cors from "cors";
+
+import { auth } from "./middleware/auth.js";
 
 const app = express();
 const PORT = 4000;
@@ -12,6 +15,9 @@ const client = new MongoClient(MONGO_URL);
 await client.connect();
 console.log("mongo connected");
 //_____________________________________
+
+app.use(cors());
+app.use(auth);
 
 app.get("/", (req, res) => {
   try {
@@ -28,7 +34,26 @@ app.get("/movies", async (req, res) => {
       .collection("movies")
       .aggregate([
         { $unwind: "$genres" },
-        { $group: { _id: "$genres", movies: { $push: "$$ROOT" } } },
+        {
+          $group: {
+            _id: "$genres",
+            movies: { $push: "$$ROOT" },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            movies: {
+              _id: 1,
+              director: 1,
+              imdb_rating: 1,
+              length: 1,
+              backdrop: 1,
+              title: 1,
+              slug: 1,
+            },
+          },
+        },
       ])
       .toArray();
     console.log(allMovies);
